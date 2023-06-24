@@ -23,8 +23,8 @@ void IdleFunc(void);
 void TimerFunc(int);
 void ReshapeFunc(int, int);
 
-#define	NUM_BARRELS      36
-GLFrame frameCamera, barrels[NUM_BARRELS], fishes[(NUM_BARRELS - 6) * 2];
+#define	NUM_BARRELS 30
+GLFrame frameCamera, barrels[NUM_BARRELS], fishes[NUM_BARRELS * 2];
 
 // Light and material data
 M3DMatrix44f mShadowMatrix;
@@ -53,6 +53,7 @@ GLfloat fBackground[] = { 0.f, 0.5f, 0.75f, 1.0f }; // grey-blue background
 GLuint textures[TOTAL_TEXTURES];
 const char* szTextureFiles[] = { "./tga/grass.tga", "./tga/wood.tga", "./tga/orb.tga"};
 
+// objs to be used
 ObjParser* dolphin;
 ObjParser* seaweed;
 ObjParser* barrel;
@@ -73,7 +74,7 @@ void SetupRC()
         { 5.0f, -0.4f, -5.0f } 
 	};
 
-	// Read objs
+	// read objs
 	std::cout << "dolphin" << std::endl;
 	dolphin = new ObjParser("./obj/dolphin.obj");
 
@@ -133,12 +134,12 @@ void SetupRC()
 		fishes[iBarrel * 2 + 1].SetOrigin(x, 0.0, y); // 1, 3, 5, 7, 9
 	}
 	// direction indicators
-	barrels[30].SetOrigin( 0.0,  0.5,  0.0); // origin
-	barrels[31].SetOrigin(-1.0,  0.0, -1.0); // top left
-	barrels[32].SetOrigin( 1.0,  0.0, -1.0); // top right
-	barrels[33].SetOrigin(-1.0,  0.0,  1.0); // bottom right
-	barrels[34].SetOrigin( 1.0,  0.0,  1.0); // bottom left
-	barrels[35].SetOrigin( 0.0,  0.0, -0.5); // front
+	// barrels[30].SetOrigin( 0.0,  0.5,  0.0); // origin
+	// barrels[31].SetOrigin(-1.0,  0.0, -1.0); // top left
+	// barrels[32].SetOrigin( 1.0,  0.0, -1.0); // top right
+	// barrels[33].SetOrigin(-1.0,  0.0,  1.0); // bottom right
+	// barrels[34].SetOrigin( 1.0,  0.0,  1.0); // bottom left
+	// barrels[35].SetOrigin( 0.0,  0.0, -0.5); // front
 
     // Set up texture maps
     glEnable(GL_TEXTURE_2D);
@@ -257,75 +258,7 @@ void DrawGround(void)
 		s += texStep;
 	}
 }
-//void DrawCustom(GLint nShadow)
-//{
-//	float ratio;
-//	GLint i;
-//	static GLfloat yRot = 0.0f; // Rotation angle for animation
-//
-//	if (nShadow == 0)
-//	{
-//		yRot += 0.5f;
-//		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-//	}
-//	else // Shadow color
-//	{
-//		glColor4f(0.00f, 0.00f, 0.00f, .6f);
-//	}
-//	// Draw the randomly located barrels
-//	glBindTexture(GL_TEXTURE_2D, textures[BARREL_TEXTURE]);
-//	for (i = 0; i < NUM_BARRELS; i++)
-//	{
-//		ratio = 0.05f;
-//
-//		glPushMatrix();
-//		{
-//			barrels[i].ApplyActorTransform();
-//			glTranslatef(0.f, -0.4f, 0.f);
-//			glScalef(ratio, ratio, ratio);
-//			barrel->Draw(GL_TRIANGLES, true);
-//		}
-//		glPopMatrix();
-//	}
-//	// Draw the dolphin swim around seaweed (Object_B)
-//	glPushMatrix();
-//	{
-//		glTranslatef(0.0f, 0.1f, -2.5f);
-//		glRotatef(yRot, 0.0f, 1.0f, 0.0f);
-//		glTranslatef(1.0f, 0.0f, 0.0f);
-//
-//		ratio = 0.005f;
-//		glScalef(ratio, ratio, ratio);
-//
-//		glBindTexture(GL_TEXTURE_2D, textures[DOLPHIN_TEXTURE]);
-//		dolphin->Draw(GL_TRIANGLES, true);
-//	}
-//	glPopMatrix();
-//	// Draw the seaweed (Object_A)
-//	glPushMatrix(); // no texture for this obj
-//	{
-//		glTranslatef(-0.1f, -0.43f, 2.3f);
-//		//glRotatef(yRot, 0.0f, 1.0f, 0.0f);
-//		//glTranslatef(0.f, 0.f, -2.5f);
-//		//glPushMatrix();
-//		//glPopMatrix();
-//		//glTranslatef(-1.f, -4.3f, 23.f); // to origin
-//		//glRotatef(yRot, 0.0f, 1.0f, 0.0f); // rotate along y-axis
-//		//glTranslatef(0.f, 0.f, -20.f); // to dest
-//
-//		ratio = 0.1f;
-//		glScalef(ratio, ratio, ratio);
-//
-//		if (nShadow == 0)
-//		{
-//			glColorMaterial(GL_FRONT, GL_SPECULAR);
-//			glMaterialfv(GL_FRONT, GL_SPECULAR, fNoLight);
-//			glColor4f(0.f, 1.f, 0.f, 1.f); // set seaweed to green
-//		}
-//		seaweed->Draw(GL_TRIANGLES, false);
-//	}
-//	glPopMatrix();
-//}
+
 void DrawCustom(GLint nShadow)
 {
 	float ratio;
@@ -347,6 +280,7 @@ void DrawCustom(GLint nShadow)
 	if (nShadow == 0)
 	{
 		yRot += 0.5f;
+		if (stop) { dRot += 0.5f; }
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	else // Shadow color
@@ -370,7 +304,7 @@ void DrawCustom(GLint nShadow)
 		}
 		glPopMatrix();
 
-		if (i >= NUM_BARRELS - 6) { continue; } // indicators wont have fishes
+		// if (i >= NUM_BARRELS - 6) { continue; } // indicators wont have fishes
 
 		ratio = 0.04f;
 		fCosWave = ((float)cosWave) / 10.0f;
@@ -397,14 +331,14 @@ void DrawCustom(GLint nShadow)
 		glPopMatrix();
 	}
 
-	// Draw the dolphin (Object_C) swim around seaweed
+	// Draw the dolphin (Object_C) swim around seaweed. Stop will last for a full round, 
 	glPushMatrix();
 	{
 		ratio = 0.005f;
 		glScalef(ratio, ratio, ratio);
 
 		glTranslatef(0.0f, 20.f, -500.f);
-		glRotatef((yRot - dRot) * 2, 0.0f, 1.0f, 0.0f);
+		glRotatef((yRot - dRot) * 2, 0.0f, 1.0f, 0.0f); // if stop, dolphin stays
 		glTranslatef(200.f + dx, 0.f + dy, 0.f + dz);
 
 		glBindTexture(GL_TEXTURE_2D, textures[DOLPHIN_TEXTURE]);
@@ -419,7 +353,6 @@ void DrawCustom(GLint nShadow)
 		glScalef(ratio, ratio, ratio);
 
 		glTranslatef(-1.f, -4.3f, 0.f);
-		
 		//glTranslatef(-1.f, -4.3f, 23.f); // to origin
 		//glRotatef(yRot, 0.0f, 1.0f, 0.0f); // rotate along y-axis
 		//glTranslatef(0.f, 0.f, -20.f); // to dest
@@ -435,7 +368,6 @@ void DrawCustom(GLint nShadow)
 	glPopMatrix();
 
 	if (nShadow != 0) { return; }
-	if (stop) { dRot += 0.5f; }
 	
 	if (counter++ >= 5)
 	{
@@ -457,8 +389,9 @@ void DrawCustom(GLint nShadow)
 		// reset swim counter
 		moveCounter = 0;
 		// check if dolphin need to stop
-		stop = (rand() % 2 == 1);
-		std::cout << "stop: " << stop << " dRot: " << dRot << std::endl;
+		if (stop == true && dRot >= 180) { stop = false; } // unfreeze dolphin after stopped for a round
+		else if (stop == false) { stop = (rand() % 2 == 1); }
+		std::cout << "stop: " << stop << " dRot: " << dRot << std::endl; // debug
 
 		if (!stop)
 		{
@@ -470,7 +403,7 @@ void DrawCustom(GLint nShadow)
 			dx = std::min(threshold, std::max(-threshold, dx));
 			dy = std::min(threshold, std::max(-threshold, dy));
 			dz = std::min(threshold, std::max(-threshold, dz));
-			//std::cout << "dx: " << dx << " dy: " << dy << " dz: " << dz << std::endl;
+			//std::cout << "dx: " << dx << " dy: " << dy << " dz: " << dz << std::endl; // debug
 		}
 	}
 }
@@ -505,8 +438,7 @@ void DisplayFunc(void)
 		glPushMatrix();
 		{
 			glMultMatrixf(mShadowMatrix);
-			//DrawInhabitants(1);
-			DrawCustom(1);
+			DrawCustom(1); // Draw shadow
 		}
 		glPopMatrix();
 
@@ -517,7 +449,6 @@ void DisplayFunc(void)
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_DEPTH_TEST);
 
-		//DrawInhabitants(0); // Draw inhabitants normally
 		DrawCustom(0); // Draw normally
 	}
 	glPopMatrix();
